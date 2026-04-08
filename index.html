@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#0a0a0a"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Qween"/>
+<title>Qween Refiner</title>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface2: #1c1c1c;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #f0ede8;
+    --muted: #888;
+    --dim: #555;
+    --accent: #c8f060;
+    --accent2: #a8d040;
+    --danger: #ff6b6b;
+    --radius: 12px;
+    --radius-lg: 18px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; overflow-x: hidden; }
+
+  body { padding-bottom: env(safe-area-inset-bottom); }
+
+  #app {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0 0 2rem;
+  }
+
+  /* Header */
+  .header {
+    padding: 1.25rem 1.25rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .logo {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .logo-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    line-height: 1;
+  }
+  .logo-sub {
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .model-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface);
+    border: 0.5px solid var(--border2);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  .model-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* Upload zone */
+  .upload-section { padding: 1.25rem; flex: 0 0 auto; }
+
+  .upload-zone {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: var(--surface);
+    border: 1px dashed var(--border2);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .upload-zone:active { border-color: var(--accent); }
+  .upload-zone.has-image { border-style: solid; border-color: var(--border); padding: 0; }
+  .upload-zone img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    display: block;
+  }
+  .upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .upload-icon-wrap {
+    width: 52px;
+    height: 52px;
+    border: 1px solid var(--border2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .upload-icon-wrap svg { width: 22px; height: 22px; stroke: var(--muted); }
+  .upload-text { font-size: 13px; color: var(--muted); }
+  .upload-hint { font-size: 11px; color: var(--dim); }
+
+  .change-overlay {
+    display: none;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.7);
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 11px;
+    color: var(--muted);
+    backdrop-filter: blur(8px);
+  }
+  .upload-zone.has-image:hover .change-overlay,
+  .upload-zone.has-image:active .change-overlay { display: block; }
+
+  /* Buttons row */
+  .btn-section { padding: 0 1.25rem; display: flex; gap: 8px; margin-bottom: 1rem; }
+  .btn-cam, .btn-gallery {
+    flex: 1;
+    padding: 11px;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border2);
+    background: var(--surface);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .btn-cam:active, .btn-gallery:active { background: var(--surface2); border-color: var(--border2); }
+  .btn-cam svg, .btn-gallery svg { width: 15px; height: 15px; stroke: currentColor; }
+
+  /* Prompt */
+  .prompt-section { padding: 0 1.25rem 1rem; }
+  .prompt-label { font-size: 10px; color: var(--dim); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+  .prompt-wrap { position: relative; }
+  .prompt-input {
+    width: 100%;
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+    resize: none;
+    outline: none;
+    line-height: 1.5;
+    transition: border-color 0.2s;
+  }
+  .prompt-input::placeholder { color: var(--dim); }
+  .prompt-input:focus { border-color: var(--border2); }
+
+  /* Refine button */
+  .refine-section { padding: 0 1.25rem 1.25rem; }
+  .btn-refine {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: #0a0a0a;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn-refine:active { transform: scale(0.98); background: var(--accent2); }
+  .btn-refine:disabled { background: var(--surface2); color: var(--dim); cursor: not-allowed; transform: none; }
+
+  /* Status */
+  .status-bar {
+    display: none;
+    margin: 0 1.25rem 1rem;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    align-items: center;
+    gap: 10px;
+  }
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--border2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .status-text { font-size: 12px; color: var(--muted); letter-spacing: 0.03em; }
+  .status-dots::after {
+    content: '';
+    animation: dots 1.5s steps(4, end) infinite;
+  }
+  @keyframes dots {
+    0%   { content: ''; }
+    25%  { content: '.'; }
+    50%  { content: '..'; }
+    75%  { content: '...'; }
+  }
+
+  /* Error */
+  .error-box {
+    display: none;
+    margin: 0 1.25rem 1rem;
+    padding: 11px 14px;
+    background: rgba(255,107,107,0.08);
+    border: 0.5px solid rgba(255,107,107,0.3);
+    border-radius: var(--radius);
+    font-size: 12px;
+    color: var(--danger);
+    line-height: 1.5;
+  }
+
+  /* Results */
+  .results-section {
+    display: none;
+    padding: 0 1.25rem;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .results-label {
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .result-card { display: flex; flex-direction: column; gap: 6px; }
+  .result-tag {
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .result-tag.refined { color: var(--accent); }
+  .result-img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 0.5px solid var(--border);
+    display: block;
+  }
+
+  /* Share row */
+  .share-section {
+    display: none;
+    padding: 0 1.25rem;
+    gap: 8px;
+    margin-top: 0.25rem;
+  }
+  .btn-share {
+    flex: 1;
+    padding: 11px;
+    border-radius: var(--radius);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    border: 0.5px solid var(--border2);
+    background: var(--surface);
+    color: var(--muted);
+    transition: background 0.15s;
+  }
+  .btn-share.primary {
+    background: var(--surface2);
+    color: var(--text);
+    border-color: var(--border2);
+  }
+  .btn-share:active { opacity: 0.7; }
+
+  /* Install banner */
+  .install-banner {
+    display: none;
+    margin: 1.25rem 1.25rem 0;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius);
+    align-items: center;
+    gap: 10px;
+    justify-content: space-between;
+  }
+  .install-text { font-size: 11px; color: var(--muted); line-height: 1.4; }
+  .btn-install {
+    padding: 7px 14px;
+    background: var(--accent);
+    color: #0a0a0a;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="header">
+    <div class="logo">
+      <span class="logo-name">Qween</span>
+      <span class="logo-sub">photo refiner</span>
+    </div>
+    <div class="model-badge">
+      <div class="model-dot"></div>
+      <span>Gemini 2.0</span>
+    </div>
+  </div>
+
+  <div class="install-banner" id="installBanner">
+    <span class="install-text">Add to home screen<br>for quick access</span>
+    <button class="btn-install" id="installBtn">Install</button>
+  </div>
+
+  <div class="upload-section">
+    <div class="upload-zone" id="uploadZone" onclick="triggerCamera()">
+      <div class="upload-placeholder" id="uploadPlaceholder">
+        <div class="upload-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+        </div>
+        <span class="upload-text">Tap to take photo</span>
+        <span class="upload-hint">or tap gallery below</span>
+      </div>
+      <div class="change-overlay">change</div>
+    </div>
+  </div>
+
+  <div class="btn-section">
+    <button class="btn-cam" onclick="triggerCamera()">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+        <circle cx="12" cy="13" r="4"/>
+      </svg>
+      Camera
+    </button>
+    <button class="btn-gallery" onclick="triggerGallery()">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21 15 16 10 5 21"/>
+      </svg>
+      Gallery
+    </button>
+  </div>
+
+  <input type="file" id="fileCam" accept="image/*" capture="environment" style="display:none" onchange="onFileSelect(event)"/>
+  <input type="file" id="fileGal" accept="image/*" style="display:none" onchange="onFileSelect(event)"/>
+
+  <div class="prompt-section">
+    <div class="prompt-label">Refinement prompt</div>
+    <div class="prompt-wrap">
+      <textarea class="prompt-input" id="promptInput" rows="4" placeholder="What to fix...">Professional jewellery product photo. Solid background colour #FCF9F8 (warm off-white cream). Jewellery centred, fills 70% of frame. Soft natural shadow directly beneath the piece. Portrait 4:5 crop. Sharp focus on jewellery details, clean edges, no clutter, no text, no watermark. Soft even studio lighting matching luxury jewellery brand standards.</textarea>
+    </div>
+  </div>
+
+  <div class="refine-section">
+    <button class="btn-refine" id="refineBtn" onclick="refineImage()" disabled>Refine image</button>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="status-bar" id="statusBar">
+    <div class="spinner"></div>
+    <span class="status-text">Refining with Gemini<span class="status-dots"></span></span>
+  </div>
+
+  <div class="results-section" id="resultsSection">
+    <div class="results-label">Result</div>
+    <div class="results-grid">
+      <div class="result-card">
+        <span class="result-tag">Original</span>
+        <img id="originalImg" class="result-img"/>
+      </div>
+      <div class="result-card">
+        <span class="result-tag refined">Refined ✦</span>
+        <img id="refinedImg" class="result-img"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="share-section" id="shareSection">
+    <button class="btn-share" onclick="downloadRefined()">Save</button>
+    <button class="btn-share primary" onclick="shareRefined()">Share ↗</button>
+    <button class="btn-share" onclick="resetAll()">New ↺</button>
+  </div>
+
+</div>
+
+<script>
+const GEMINI_KEY = 'AIzaSyDE9TC9Y8ne-Bx69uDD7MLE-PzL9DpzJYk';
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=' + GEMINI_KEY;
+
+let selectedFile = null;
+let selectedB64 = null;
+let selectedMime = null;
+let refinedDataUrl = null;
+let deferredPrompt = null;
+
+// PWA install
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').style.display = 'flex';
+});
+document.getElementById('installBtn').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  if (outcome === 'accepted') document.getElementById('installBanner').style.display = 'none';
+});
+
+// SW register
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+function triggerCamera() {
+  document.getElementById('fileCam').click();
+}
+function triggerGallery() {
+  document.getElementById('fileGal').click();
+}
+
+function onFileSelect(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  selectedFile = file;
+  selectedMime = file.type || 'image/jpeg';
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const dataUrl = ev.target.result;
+    selectedB64 = dataUrl.split(',')[1];
+    const zone = document.getElementById('uploadZone');
+    zone.innerHTML = '<img src="' + dataUrl + '"/><div class="change-overlay">change</div>';
+    zone.classList.add('has-image');
+    zone.onclick = triggerCamera;
+    document.getElementById('refineBtn').disabled = false;
+    hideError();
+    document.getElementById('resultsSection').style.display = 'none';
+    document.getElementById('shareSection').style.display = 'none';
+    refinedDataUrl = null;
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+}
+
+function showError(msg) {
+  const b = document.getElementById('errorBox');
+  b.textContent = msg;
+  b.style.display = 'block';
+}
+function hideError() {
+  document.getElementById('errorBox').style.display = 'none';
+}
+
+async function refineImage() {
+  if (!selectedB64) return;
+  const prompt = document.getElementById('promptInput').value.trim() ||
+    'Clean white background, professional product photo, sharp focus, remove clutter';
+
+  hideError();
+  document.getElementById('refineBtn').disabled = true;
+  document.getElementById('statusBar').style.display = 'flex';
+  document.getElementById('resultsSection').style.display = 'none';
+  document.getElementById('shareSection').style.display = 'none';
+
+  try {
+    const body = {
+      contents: [{
+        parts: [
+          {
+            text: 'You are a luxury jewellery product photographer AI for the brand Qween. ' +
+                  'Recompose this product photo to exactly match this standard: ' + prompt +
+                  ' IMPORTANT: The background must be solid hex colour #FCF9F8. ' +
+                  'Do NOT add any text, logo, watermark, border, or frame. Return ONLY the refined product image.'
+          },
+          { inline_data: { mime_type: selectedMime, data: selectedB64 } }
+        ]
+      }],
+      generationConfig: { responseModalities: ['IMAGE', 'TEXT'] }
+    };
+
+    const res = await fetch(GEMINI_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error((err.error && err.error.message) || 'Gemini error ' + res.status);
+    }
+
+    const data = await res.json();
+    const parts = data.candidates?.[0]?.content?.parts || [];
+    let imgPart = parts.find(p => p.inlineData);
+    if (!imgPart) throw new Error('No image returned. Try a simpler prompt or a different photo.');
+
+    refinedDataUrl = 'data:' + imgPart.inlineData.mimeType + ';base64,' + imgPart.inlineData.data;
+    document.getElementById('originalImg').src = 'data:' + selectedMime + ';base64,' + selectedB64;
+    document.getElementById('refinedImg').src = refinedDataUrl;
+    document.getElementById('resultsSection').style.display = 'flex';
+    document.getElementById('shareSection').style.display = 'flex';
+
+  } catch (err) {
+    showError(err.message || 'Something went wrong. Please try again.');
+  } finally {
+    document.getElementById('statusBar').style.display = 'none';
+    document.getElementById('refineBtn').disabled = false;
+  }
+}
+
+function downloadRefined() {
+  if (!refinedDataUrl) return;
+  const a = document.createElement('a');
+  a.href = refinedDataUrl;
+  a.download = 'qween-' + Date.now() + '.png';
+  a.click();
+}
+
+async function shareRefined() {
+  if (!refinedDataUrl) return;
+  if (navigator.share) {
+    try {
+      const res = await fetch(refinedDataUrl);
+      const blob = await res.blob();
+      const file = new File([blob], 'qween-product.png', { type: 'image/png' });
+      await navigator.share({ files: [file], title: 'Product photo', text: 'Refined with Qween' });
+      return;
+    } catch {}
+  }
+  downloadRefined();
+}
+
+function resetAll() {
+  selectedFile = null;
+  selectedB64 = null;
+  selectedMime = null;
+  refinedDataUrl = null;
+  const zone = document.getElementById('uploadZone');
+  zone.innerHTML = `<div class="upload-placeholder" id="uploadPlaceholder">
+    <div class="upload-icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+        <circle cx="12" cy="13" r="4"/>
+      </svg>
+    </div>
+    <span class="upload-text">Tap to take photo</span>
+    <span class="upload-hint">or tap gallery below</span>
+  </div>
+  <div class="change-overlay">change</div>`;
+  zone.classList.remove('has-image');
+  zone.onclick = triggerCamera;
+  document.getElementById('refineBtn').disabled = true;
+  document.getElementById('resultsSection').style.display = 'none';
+  document.getElementById('shareSection').style.display = 'none';
+  document.getElementById('statusBar').style.display = 'none';
+  hideError();
+}
+</script>
+</body>
+</html>
