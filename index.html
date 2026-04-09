@@ -64,7 +64,7 @@
   .btn-cam svg, .btn-gallery svg { width: 15px; height: 15px; stroke: currentColor; }
 
   .bulk-section { padding: 0.75rem 1.25rem 0; display: none; flex-direction: column; gap: 10px; }
-  .bulk-drop { width: 100%; min-height: 140px; background: var(--surface); border: 1px dashed var(--border2); border-radius: var(--radius-lg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: border-color 0.2s; padding: 1.5rem; }
+  .bulk-drop { width: 100%; min-height: 120px; background: var(--surface); border: 1px dashed var(--border2); border-radius: var(--radius-lg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: border-color 0.2s; padding: 1.25rem; }
   .bulk-drop:active { border-color: var(--accent); }
   .bulk-drop-text { font-size: 13px; color: var(--muted); }
   .bulk-drop-hint { font-size: 11px; color: var(--dim); }
@@ -180,19 +180,20 @@
 
   <!-- BULK MODE -->
   <div id="bulkMode" class="bulk-section">
+    <!-- Add more button always visible when queue exists -->
     <div class="bulk-drop" id="bulkDrop" onclick="document.getElementById('fileBulk').click()">
       <div class="upload-icon-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--muted)">
           <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
         </svg>
       </div>
-      <span class="bulk-drop-text">Tap to select multiple photos</span>
-      <span class="bulk-drop-hint">up to 10 at a time</span>
+      <span class="bulk-drop-text" id="bulkDropText">Tap to add photos</span>
+      <span class="bulk-drop-hint">tap again to add more (max 10)</span>
     </div>
     <div id="bulkQueue" style="display:none; flex-direction:column; gap:8px;">
       <div style="display:flex; align-items:center; justify-content:space-between;">
         <span class="bulk-count" id="bulkCount">0 photos selected</span>
-        <button style="background:transparent;border:none;color:var(--dim);font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;" onclick="clearBulk()">clear</button>
+        <button style="background:transparent;border:none;color:var(--dim);font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;" onclick="clearBulk()">clear all</button>
       </div>
       <div class="bulk-grid" id="bulkGrid"></div>
     </div>
@@ -200,7 +201,8 @@
 
   <input type="file" id="fileCam" accept="image/*" capture="environment" style="display:none" onchange="onSingleSelect(event)"/>
   <input type="file" id="fileGal" accept="image/*" style="display:none" onchange="onSingleSelect(event)"/>
-  <input type="file" id="fileBulk" accept="image/*" multiple style="display:none" onchange="onBulkSelect(event)"/>
+  <!-- no multiple attr — we append manually so iOS works -->
+  <input type="file" id="fileBulk" accept="image/*" style="display:none" onchange="onBulkSelect(event)"/>
 
   <div class="prompt-section">
     <div class="section-label">Refinement prompt</div>
@@ -255,12 +257,13 @@ let currentMode = 'single';
 let selectedB64 = null;
 let selectedMime = null;
 let refinedDataUrl = null;
-let bulkFiles = [];
+let bulkFiles = [];       // accumulates across taps
 let bulkResults = [];
 let deferredPrompt = null;
 
 const GEMINI_KEY_STORE = 'qween_gemini_key';
 const OPENAI_KEY_STORE = 'qween_openai_key';
+const MAX_BULK = 10;
 
 function setModel(m) {
   currentModel = m;
@@ -306,7 +309,7 @@ function updateRefineBtn() {
     btn.textContent = 'Refine image';
   } else {
     btn.disabled = bulkFiles.length === 0;
-    btn.textContent = bulkFiles.length > 0 ? 'Refine ' + bulkFiles.length + ' images' : 'Refine images';
+    btn.textContent = bulkFiles.length > 0 ? 'Refine ' + bulkFiles.length + ' image' + (bulkFiles.length > 1 ? 's' : '') : 'Refine images';
   }
 }
 
@@ -340,29 +343,45 @@ function onSingleSelect(e) {
   e.target.value = '';
 }
 
+// KEY FIX: append to bulkFiles instead of replacing
 function onBulkSelect(e) {
-  const files = Array.from(e.target.files).slice(0, 10);
-  if (!files.length) return;
-  bulkFiles = files;
-  bulkResults = [];
+  const incoming = Array.from(e.target.files);
+  if (!incoming.length) return;
+
+  const remaining = MAX_BULK - bulkFiles.length;
+  if (remaining <= 0) {
+    showError('Maximum ' + MAX_BULK + ' images reached. Remove some first.');
+    e.target.value = '';
+    return;
+  }
+
+  const toAdd = incoming.slice(0, remaining);
+  bulkFiles = bulkFiles.concat(toAdd);
+
   renderBulkQueue();
   document.getElementById('bulkResults').style.display = 'none';
   document.getElementById('bulkActions').style.display = 'none';
   updateRefineBtn();
-  e.target.value = '';
+  e.target.value = ''; // reset so same file can be re-added and next tap opens picker
 }
 
 function renderBulkQueue() {
   const grid = document.getElementById('bulkGrid');
   const queue = document.getElementById('bulkQueue');
-  document.getElementById('bulkCount').textContent = bulkFiles.length + ' photo' + (bulkFiles.length !== 1 ? 's' : '') + ' selected';
+  const count = bulkFiles.length;
+
+  document.getElementById('bulkCount').textContent = count + ' photo' + (count !== 1 ? 's' : '') + ' selected';
+  document.getElementById('bulkDropText').textContent = count >= MAX_BULK ? 'Max photos reached' : 'Tap to add more photos';
+
   grid.innerHTML = '';
   bulkFiles.forEach((file, i) => {
     const url = URL.createObjectURL(file);
     const div = document.createElement('div');
     div.className = 'bulk-thumb';
     div.id = 'thumb-' + i;
-    div.innerHTML = '<img src="' + url + '"/><button class="thumb-remove" onclick="removeBulkFile(' + i + ')">×</button><div class="thumb-status pending" id="thumb-status-' + i + '">pending</div>';
+    div.innerHTML = '<img src="' + url + '"/>' +
+      '<button class="thumb-remove" onclick="removeBulkFile(' + i + ')">×</button>' +
+      '<div class="thumb-status pending" id="thumb-status-' + i + '">pending</div>';
     grid.appendChild(div);
   });
   queue.style.display = 'flex';
@@ -381,6 +400,7 @@ function clearBulk() {
   document.getElementById('bulkGrid').innerHTML = '';
   document.getElementById('bulkResults').style.display = 'none';
   document.getElementById('bulkActions').style.display = 'none';
+  document.getElementById('bulkDropText').textContent = 'Tap to add photos';
   updateRefineBtn();
 }
 
@@ -457,7 +477,10 @@ function renderBulkResults() {
     if (!r || r.error) return;
     const div = document.createElement('div');
     div.className = 'bulk-result-card';
-    div.innerHTML = '<div class="bulk-result-pair"><div><div class="bulk-result-label">Original</div><img class="bulk-result-img" src="' + r.original + '"/></div><div><div class="bulk-result-label refined">Refined ✦</div><img class="bulk-result-img" src="' + r.refined + '"/></div></div><button class="bulk-dl-btn" onclick="downloadBulkItem(' + i + ')">Save ↓</button>';
+    div.innerHTML = '<div class="bulk-result-pair">' +
+      '<div><div class="bulk-result-label">Original</div><img class="bulk-result-img" src="' + r.original + '"/></div>' +
+      '<div><div class="bulk-result-label refined">Refined ✦</div><img class="bulk-result-img" src="' + r.refined + '"/></div>' +
+      '</div><button class="bulk-dl-btn" onclick="downloadBulkItem(' + i + ')">Save ↓</button>';
     grid.appendChild(div);
   });
   const hasResults = bulkResults.some(r => r && !r.error);
