@@ -15,19 +15,11 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
 <style>
   :root {
-    --bg: #0a0a0a;
-    --surface: #141414;
-    --surface2: #1c1c1c;
-    --border: rgba(255,255,255,0.08);
-    --border2: rgba(255,255,255,0.14);
-    --text: #f0ede8;
-    --muted: #888;
-    --dim: #555;
-    --accent: #c8f060;
-    --accent2: #a8d040;
-    --danger: #ff6b6b;
-    --radius: 12px;
-    --radius-lg: 18px;
+    --bg: #0a0a0a; --surface: #141414; --surface2: #1c1c1c;
+    --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.14);
+    --text: #f0ede8; --muted: #888; --dim: #555;
+    --accent: #c8f060; --accent2: #a8d040; --danger: #ff6b6b;
+    --radius: 12px; --radius-lg: 18px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; overflow-x: hidden; }
@@ -38,26 +30,24 @@
   .logo { display: flex; flex-direction: column; gap: 1px; }
   .logo-name { font-family: 'Instrument Serif', serif; font-size: 22px; letter-spacing: -0.02em; color: var(--text); line-height: 1; }
   .logo-sub { font-size: 10px; color: var(--dim); letter-spacing: 0.08em; text-transform: uppercase; }
-
   .model-toggle { display: flex; background: var(--surface); border: 0.5px solid var(--border2); border-radius: 20px; padding: 3px; gap: 2px; }
   .model-btn { padding: 5px 12px; border-radius: 16px; border: none; background: transparent; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; cursor: pointer; transition: all 0.15s; letter-spacing: 0.03em; }
   .model-btn.active { background: var(--surface2); color: var(--text); border: 0.5px solid var(--border2); }
 
   .key-section { padding: 0.75rem 1.25rem 0; }
-  .key-label { font-size: 10px; color: var(--dim); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 5px; }
+  .section-label { font-size: 10px; color: var(--dim); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 5px; }
   .key-wrap { display: flex; gap: 8px; align-items: center; }
   .key-input { flex: 1; background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 9px 12px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text); outline: none; transition: border-color 0.2s; }
   .key-input:focus { border-color: var(--border2); }
   .key-input::placeholder { color: var(--dim); }
   .key-save { padding: 9px 14px; background: var(--surface2); border: 0.5px solid var(--border2); border-radius: var(--radius); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; cursor: pointer; white-space: nowrap; }
-  .key-save:active { opacity: 0.7; }
   .key-saved { font-size: 10px; color: var(--accent); margin-top: 4px; display: none; }
 
-  .install-banner { display: none; margin: 0.75rem 1.25rem 0; padding: 12px 14px; background: var(--surface); border: 0.5px solid var(--border2); border-radius: var(--radius); align-items: center; gap: 10px; justify-content: space-between; }
-  .install-text { font-size: 11px; color: var(--muted); line-height: 1.4; }
-  .btn-install { padding: 7px 14px; background: var(--accent); color: #0a0a0a; border: none; border-radius: 8px; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+  .mode-tabs { display: flex; margin: 0.75rem 1.25rem 0; background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 3px; gap: 3px; }
+  .mode-tab { flex: 1; padding: 8px; border: none; background: transparent; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; border-radius: 9px; transition: all 0.15s; letter-spacing: 0.03em; }
+  .mode-tab.active { background: var(--surface2); color: var(--text); border: 0.5px solid var(--border2); }
 
-  .upload-section { padding: 1rem 1.25rem 0; }
+  .upload-section { padding: 0.75rem 1.25rem 0; }
   .upload-zone { position: relative; width: 100%; aspect-ratio: 4/3; background: var(--surface); border: 1px dashed var(--border2); border-radius: var(--radius-lg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; cursor: pointer; overflow: hidden; transition: border-color 0.2s; }
   .upload-zone:active { border-color: var(--accent); }
   .upload-zone.has-image { border-style: solid; border-color: var(--border); padding: 0; }
@@ -66,16 +56,30 @@
   .upload-icon-wrap svg { width: 22px; height: 22px; stroke: var(--muted); }
   .upload-text { font-size: 13px; color: var(--muted); }
   .upload-hint { font-size: 11px; color: var(--dim); }
-  .change-overlay { display: none; position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); border: 0.5px solid var(--border2); border-radius: 8px; padding: 5px 10px; font-size: 11px; color: var(--muted); backdrop-filter: blur(8px); }
+  .change-overlay { display: none; position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); border: 0.5px solid var(--border2); border-radius: 8px; padding: 5px 10px; font-size: 11px; color: var(--muted); }
   .upload-zone.has-image:active .change-overlay { display: block; }
 
   .btn-section { padding: 0.75rem 1.25rem 0; display: flex; gap: 8px; }
-  .btn-cam, .btn-gallery { flex: 1; padding: 11px; border-radius: var(--radius); border: 0.5px solid var(--border2); background: var(--surface); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; letter-spacing: 0.03em; display: flex; align-items: center; justify-content: center; gap: 7px; transition: background 0.15s; }
-  .btn-cam:active, .btn-gallery:active { background: var(--surface2); }
+  .btn-cam, .btn-gallery { flex: 1; padding: 11px; border-radius: var(--radius); border: 0.5px solid var(--border2); background: var(--surface); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; letter-spacing: 0.03em; display: flex; align-items: center; justify-content: center; gap: 7px; }
   .btn-cam svg, .btn-gallery svg { width: 15px; height: 15px; stroke: currentColor; }
 
+  .bulk-section { padding: 0.75rem 1.25rem 0; display: none; flex-direction: column; gap: 10px; }
+  .bulk-drop { width: 100%; min-height: 140px; background: var(--surface); border: 1px dashed var(--border2); border-radius: var(--radius-lg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: border-color 0.2s; padding: 1.5rem; }
+  .bulk-drop:active { border-color: var(--accent); }
+  .bulk-drop-text { font-size: 13px; color: var(--muted); }
+  .bulk-drop-hint { font-size: 11px; color: var(--dim); }
+  .bulk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .bulk-thumb { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: var(--surface2); }
+  .bulk-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .bulk-thumb .thumb-remove { position: absolute; top: 4px; right: 4px; width: 18px; height: 18px; background: rgba(0,0,0,0.7); border: none; border-radius: 50%; color: var(--muted); font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+  .bulk-thumb .thumb-status { position: absolute; bottom: 0; left: 0; right: 0; padding: 3px 5px; font-size: 9px; text-align: center; letter-spacing: 0.04em; text-transform: uppercase; }
+  .thumb-status.pending { background: rgba(0,0,0,0.5); color: var(--dim); }
+  .thumb-status.processing { background: rgba(200,240,96,0.2); color: var(--accent); }
+  .thumb-status.done { background: rgba(200,240,96,0.3); color: var(--accent); }
+  .thumb-status.error { background: rgba(255,107,107,0.3); color: var(--danger); }
+  .bulk-count { font-size: 11px; color: var(--muted); }
+
   .prompt-section { padding: 0.75rem 1.25rem 0; }
-  .prompt-label { font-size: 10px; color: var(--dim); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 5px; }
   .prompt-input { width: 100%; background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 10px 12px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text); resize: none; outline: none; line-height: 1.5; transition: border-color 0.2s; }
   .prompt-input::placeholder { color: var(--dim); }
   .prompt-input:focus { border-color: var(--border2); }
@@ -89,23 +93,34 @@
   .spinner { width: 16px; height: 16px; border: 1.5px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .status-text { font-size: 12px; color: var(--muted); }
-  .status-dots::after { content: ''; animation: dots 1.5s steps(4,end) infinite; }
-  @keyframes dots { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
 
   .error-box { display: none; margin: 0.75rem 1.25rem 0; padding: 11px 14px; background: rgba(255,107,107,0.08); border: 0.5px solid rgba(255,107,107,0.3); border-radius: var(--radius); font-size: 12px; color: var(--danger); line-height: 1.5; }
 
   .results-section { display: none; padding: 0.75rem 1.25rem 0; flex-direction: column; gap: 0.75rem; }
-  .results-label { font-size: 10px; color: var(--dim); letter-spacing: 0.08em; text-transform: uppercase; }
   .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .result-card { display: flex; flex-direction: column; gap: 6px; }
   .result-tag { font-size: 10px; color: var(--dim); letter-spacing: 0.06em; text-transform: uppercase; }
   .result-tag.refined { color: var(--accent); }
   .result-img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; border: 0.5px solid var(--border); display: block; }
 
+  .bulk-results { display: none; padding: 0.75rem 1.25rem 0; flex-direction: column; gap: 10px; }
+  .bulk-results-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .bulk-result-card { display: flex; flex-direction: column; gap: 5px; }
+  .bulk-result-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+  .bulk-result-img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; border: 0.5px solid var(--border); display: block; }
+  .bulk-result-label { font-size: 9px; color: var(--dim); letter-spacing: 0.05em; text-transform: uppercase; }
+  .bulk-result-label.refined { color: var(--accent); }
+  .bulk-dl-btn { width: 100%; padding: 7px; background: var(--surface); border: 0.5px solid var(--border2); border-radius: 8px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; cursor: pointer; letter-spacing: 0.03em; }
+  .bulk-dl-btn:active { opacity: 0.7; }
+
   .share-section { display: none; padding: 0.5rem 1.25rem 0; gap: 8px; }
-  .btn-share { flex: 1; padding: 11px; border-radius: var(--radius); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; letter-spacing: 0.04em; border: 0.5px solid var(--border2); background: var(--surface); color: var(--muted); transition: background 0.15s; }
+  .btn-share { flex: 1; padding: 11px; border-radius: var(--radius); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; letter-spacing: 0.04em; border: 0.5px solid var(--border2); background: var(--surface); color: var(--muted); }
   .btn-share.primary { background: var(--surface2); color: var(--text); }
   .btn-share:active { opacity: 0.7; }
+
+  .bulk-actions { display: none; padding: 0.5rem 1.25rem 0; gap: 8px; }
+  .btn-dl-all { flex: 1; padding: 11px; border-radius: var(--radius); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; letter-spacing: 0.04em; border: 0.5px solid var(--border2); background: var(--accent); color: #0a0a0a; font-weight: 500; }
+  .btn-new-bulk { flex: 1; padding: 11px; border-radius: var(--radius); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; letter-spacing: 0.04em; border: 0.5px solid var(--border2); background: var(--surface); color: var(--muted); }
 </style>
 </head>
 <body>
@@ -123,7 +138,7 @@
   </div>
 
   <div class="key-section">
-    <div class="key-label" id="keyLabel">Gemini API key</div>
+    <div class="section-label" id="keyLabel">Gemini API key</div>
     <div class="key-wrap">
       <input class="key-input" id="apiKeyInput" type="password" placeholder="Paste key — saved on device"/>
       <button class="key-save" onclick="saveKey()">Save</button>
@@ -131,64 +146,81 @@
     <div class="key-saved" id="keySaved">✓ key saved</div>
   </div>
 
-  <div class="install-banner" id="installBanner">
-    <span class="install-text">Add to home screen<br>for quick access</span>
-    <button class="btn-install" id="installBtn">Install</button>
+  <div class="mode-tabs">
+    <button class="mode-tab active" id="tabSingle" onclick="setMode('single')">Single</button>
+    <button class="mode-tab" id="tabBulk" onclick="setMode('bulk')">Bulk</button>
   </div>
 
-  <div class="upload-section">
-    <div class="upload-zone" id="uploadZone" onclick="triggerCamera()">
-      <div class="upload-icon-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-          <circle cx="12" cy="13" r="4"/>
-        </svg>
+  <!-- SINGLE MODE -->
+  <div id="singleMode">
+    <div class="upload-section">
+      <div class="upload-zone" id="uploadZone" onclick="triggerCamera()">
+        <div class="upload-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+        </div>
+        <span class="upload-text">Tap to take photo</span>
+        <span class="upload-hint">or tap gallery below</span>
+        <div class="change-overlay">change</div>
       </div>
-      <span class="upload-text">Tap to take photo</span>
-      <span class="upload-hint">or tap gallery below</span>
-      <div class="change-overlay">change</div>
+    </div>
+    <div class="btn-section">
+      <button class="btn-cam" onclick="triggerCamera()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        Camera
+      </button>
+      <button class="btn-gallery" onclick="triggerGallery()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        Gallery
+      </button>
     </div>
   </div>
 
-  <div class="btn-section">
-    <button class="btn-cam" onclick="triggerCamera()">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-        <circle cx="12" cy="13" r="4"/>
-      </svg>
-      Camera
-    </button>
-    <button class="btn-gallery" onclick="triggerGallery()">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="2"/>
-        <circle cx="8.5" cy="8.5" r="1.5"/>
-        <polyline points="21 15 16 10 5 21"/>
-      </svg>
-      Gallery
-    </button>
+  <!-- BULK MODE -->
+  <div id="bulkMode" class="bulk-section">
+    <div class="bulk-drop" id="bulkDrop" onclick="document.getElementById('fileBulk').click()">
+      <div class="upload-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--muted)">
+          <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+        </svg>
+      </div>
+      <span class="bulk-drop-text">Tap to select multiple photos</span>
+      <span class="bulk-drop-hint">up to 10 at a time</span>
+    </div>
+    <div id="bulkQueue" style="display:none; flex-direction:column; gap:8px;">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <span class="bulk-count" id="bulkCount">0 photos selected</span>
+        <button style="background:transparent;border:none;color:var(--dim);font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;" onclick="clearBulk()">clear</button>
+      </div>
+      <div class="bulk-grid" id="bulkGrid"></div>
+    </div>
   </div>
 
-  <input type="file" id="fileCam" accept="image/*" capture="environment" style="display:none" onchange="onFileSelect(event)"/>
-  <input type="file" id="fileGal" accept="image/*" style="display:none" onchange="onFileSelect(event)"/>
+  <input type="file" id="fileCam" accept="image/*" capture="environment" style="display:none" onchange="onSingleSelect(event)"/>
+  <input type="file" id="fileGal" accept="image/*" style="display:none" onchange="onSingleSelect(event)"/>
+  <input type="file" id="fileBulk" accept="image/*" multiple style="display:none" onchange="onBulkSelect(event)"/>
 
   <div class="prompt-section">
-    <div class="prompt-label">Refinement prompt</div>
+    <div class="section-label">Refinement prompt</div>
     <textarea class="prompt-input" id="promptInput" rows="3">Professional jewellery product photo. Solid background colour #FCF9F8 (warm off-white cream). Jewellery centred, fills 70% of frame. Soft natural shadow directly beneath the piece. Portrait 4:5 crop. Sharp focus on jewellery details, clean edges, no clutter, no text, no watermark. Soft even studio lighting matching luxury jewellery brand standards.</textarea>
   </div>
 
   <div class="refine-section">
-    <button class="btn-refine" id="refineBtn" onclick="refineImage()" disabled>Refine image</button>
+    <button class="btn-refine" id="refineBtn" onclick="refineAll()" disabled>Refine image</button>
   </div>
 
   <div class="error-box" id="errorBox"></div>
 
   <div class="status-bar" id="statusBar">
     <div class="spinner"></div>
-    <span class="status-text">Refining<span class="status-dots"></span></span>
+    <span class="status-text" id="statusText">Refining...</span>
   </div>
 
+  <!-- Single results -->
   <div class="results-section" id="resultsSection">
-    <div class="results-label">Result</div>
+    <div class="section-label">Result</div>
     <div class="results-grid">
       <div class="result-card">
         <span class="result-tag">Original</span>
@@ -200,19 +232,31 @@
       </div>
     </div>
   </div>
-
   <div class="share-section" id="shareSection">
     <button class="btn-share" onclick="downloadRefined()">Save</button>
     <button class="btn-share primary" onclick="shareRefined()">Share ↗</button>
-    <button class="btn-share" onclick="resetAll()">New ↺</button>
+    <button class="btn-share" onclick="resetSingle()">New ↺</button>
+  </div>
+
+  <!-- Bulk results -->
+  <div class="bulk-results" id="bulkResults">
+    <div class="section-label">Results</div>
+    <div class="bulk-results-grid" id="bulkResultsGrid"></div>
+  </div>
+  <div class="bulk-actions" id="bulkActions">
+    <button class="btn-dl-all" onclick="downloadAllBulk()">Save all ↓</button>
+    <button class="btn-new-bulk" onclick="resetBulk()">New batch ↺</button>
   </div>
 
 </div>
 <script>
 let currentModel = 'gemini';
+let currentMode = 'single';
 let selectedB64 = null;
 let selectedMime = null;
 let refinedDataUrl = null;
+let bulkFiles = [];
+let bulkResults = [];
 let deferredPrompt = null;
 
 const GEMINI_KEY_STORE = 'qween_gemini_key';
@@ -225,9 +269,7 @@ function setModel(m) {
   document.getElementById('keyLabel').textContent = m === 'gemini' ? 'Gemini API key' : 'OpenAI API key';
   const stored = localStorage.getItem(m === 'gemini' ? GEMINI_KEY_STORE : OPENAI_KEY_STORE) || '';
   document.getElementById('apiKeyInput').value = stored ? '••••••••••••••••' : '';
-  document.getElementById('apiKeyInput').placeholder = m === 'gemini'
-    ? 'aistudio.google.com → Get API key'
-    : 'platform.openai.com → API keys';
+  document.getElementById('apiKeyInput').placeholder = m === 'gemini' ? 'aistudio.google.com → Get API key' : 'platform.openai.com → API keys';
   document.getElementById('keySaved').style.display = stored ? 'block' : 'none';
 }
 
@@ -236,40 +278,47 @@ function saveKey() {
   if (!val || val.startsWith('••')) return;
   localStorage.setItem(currentModel === 'gemini' ? GEMINI_KEY_STORE : OPENAI_KEY_STORE, val);
   document.getElementById('apiKeyInput').value = '••••••••••••••••';
-  const s = document.getElementById('keySaved');
-  s.style.display = 'block';
-  setTimeout(() => {}, 2000);
+  document.getElementById('keySaved').style.display = 'block';
 }
 
 function getKey() {
   return localStorage.getItem(currentModel === 'gemini' ? GEMINI_KEY_STORE : OPENAI_KEY_STORE) || '';
 }
 
-// init
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault(); deferredPrompt = e;
-  document.getElementById('installBanner').style.display = 'flex';
-});
-document.getElementById('installBtn').addEventListener('click', async () => {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  deferredPrompt = null;
-  if (outcome === 'accepted') document.getElementById('installBanner').style.display = 'none';
-});
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
-
-// load saved key on start
-const savedGemini = localStorage.getItem(GEMINI_KEY_STORE);
-if (savedGemini) {
-  document.getElementById('apiKeyInput').value = '••••••••••••••••';
-  document.getElementById('keySaved').style.display = 'block';
+function setMode(m) {
+  currentMode = m;
+  document.getElementById('tabSingle').classList.toggle('active', m === 'single');
+  document.getElementById('tabBulk').classList.toggle('active', m === 'bulk');
+  document.getElementById('singleMode').style.display = m === 'single' ? 'block' : 'none';
+  document.getElementById('bulkMode').style.display = m === 'bulk' ? 'flex' : 'none';
+  document.getElementById('resultsSection').style.display = 'none';
+  document.getElementById('shareSection').style.display = 'none';
+  document.getElementById('bulkResults').style.display = 'none';
+  document.getElementById('bulkActions').style.display = 'none';
+  hideError();
+  updateRefineBtn();
 }
+
+function updateRefineBtn() {
+  const btn = document.getElementById('refineBtn');
+  if (currentMode === 'single') {
+    btn.disabled = !selectedB64;
+    btn.textContent = 'Refine image';
+  } else {
+    btn.disabled = bulkFiles.length === 0;
+    btn.textContent = bulkFiles.length > 0 ? 'Refine ' + bulkFiles.length + ' images' : 'Refine images';
+  }
+}
+
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; });
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+const savedGemini = localStorage.getItem(GEMINI_KEY_STORE);
+if (savedGemini) { document.getElementById('apiKeyInput').value = '••••••••••••••••'; document.getElementById('keySaved').style.display = 'block'; }
 
 function triggerCamera() { document.getElementById('fileCam').click(); }
 function triggerGallery() { document.getElementById('fileGal').click(); }
 
-function onFileSelect(e) {
+function onSingleSelect(e) {
   const file = e.target.files[0];
   if (!file) return;
   selectedMime = file.type || 'image/jpeg';
@@ -281,137 +330,236 @@ function onFileSelect(e) {
     zone.innerHTML = '<img src="' + dataUrl + '"/><div class="change-overlay">change</div>';
     zone.classList.add('has-image');
     zone.onclick = triggerCamera;
-    document.getElementById('refineBtn').disabled = false;
-    hideError();
     document.getElementById('resultsSection').style.display = 'none';
     document.getElementById('shareSection').style.display = 'none';
     refinedDataUrl = null;
+    hideError();
+    updateRefineBtn();
   };
   reader.readAsDataURL(file);
   e.target.value = '';
 }
 
-function showError(msg) {
-  const b = document.getElementById('errorBox');
-  b.textContent = msg;
-  b.style.display = 'block';
+function onBulkSelect(e) {
+  const files = Array.from(e.target.files).slice(0, 10);
+  if (!files.length) return;
+  bulkFiles = files;
+  bulkResults = [];
+  renderBulkQueue();
+  document.getElementById('bulkResults').style.display = 'none';
+  document.getElementById('bulkActions').style.display = 'none';
+  updateRefineBtn();
+  e.target.value = '';
 }
+
+function renderBulkQueue() {
+  const grid = document.getElementById('bulkGrid');
+  const queue = document.getElementById('bulkQueue');
+  document.getElementById('bulkCount').textContent = bulkFiles.length + ' photo' + (bulkFiles.length !== 1 ? 's' : '') + ' selected';
+  grid.innerHTML = '';
+  bulkFiles.forEach((file, i) => {
+    const url = URL.createObjectURL(file);
+    const div = document.createElement('div');
+    div.className = 'bulk-thumb';
+    div.id = 'thumb-' + i;
+    div.innerHTML = '<img src="' + url + '"/><button class="thumb-remove" onclick="removeBulkFile(' + i + ')">×</button><div class="thumb-status pending" id="thumb-status-' + i + '">pending</div>';
+    grid.appendChild(div);
+  });
+  queue.style.display = 'flex';
+}
+
+function removeBulkFile(i) {
+  bulkFiles.splice(i, 1);
+  if (bulkFiles.length === 0) { clearBulk(); return; }
+  renderBulkQueue();
+  updateRefineBtn();
+}
+
+function clearBulk() {
+  bulkFiles = [];
+  document.getElementById('bulkQueue').style.display = 'none';
+  document.getElementById('bulkGrid').innerHTML = '';
+  document.getElementById('bulkResults').style.display = 'none';
+  document.getElementById('bulkActions').style.display = 'none';
+  updateRefineBtn();
+}
+
+function showError(msg) { const b = document.getElementById('errorBox'); b.textContent = msg; b.style.display = 'block'; }
 function hideError() { document.getElementById('errorBox').style.display = 'none'; }
 
-async function refineImage() {
-  if (!selectedB64) return;
+async function refineAll() {
   const key = getKey();
   if (!key) { showError('Please paste and save your ' + (currentModel === 'gemini' ? 'Gemini' : 'OpenAI') + ' API key above first.'); return; }
+  if (currentMode === 'single') await refineSingle(key);
+  else await refineBulk(key);
+}
+
+async function refineSingle(key) {
+  if (!selectedB64) return;
   const prompt = document.getElementById('promptInput').value.trim();
   hideError();
   document.getElementById('refineBtn').disabled = true;
   document.getElementById('statusBar').style.display = 'flex';
-  document.getElementById('resultsSection').style.display = 'none';
-  document.getElementById('shareSection').style.display = 'none';
-
+  document.getElementById('statusText').textContent = 'Refining...';
   try {
-    let resultUrl;
-    if (currentModel === 'gemini') {
-      resultUrl = await callGemini(key, prompt);
-    } else {
-      resultUrl = await callOpenAI(key, prompt);
-    }
+    const resultUrl = currentModel === 'gemini'
+      ? await callGemini(key, selectedB64, selectedMime, prompt)
+      : await callOpenAI(key, selectedB64, selectedMime, prompt);
     refinedDataUrl = resultUrl;
     document.getElementById('originalImg').src = 'data:' + selectedMime + ';base64,' + selectedB64;
     document.getElementById('refinedImg').src = refinedDataUrl;
     document.getElementById('resultsSection').style.display = 'flex';
     document.getElementById('shareSection').style.display = 'flex';
   } catch (err) {
-    showError(err.message || 'Something went wrong. Please try again.');
+    showError(err.message || 'Something went wrong.');
   } finally {
     document.getElementById('statusBar').style.display = 'none';
     document.getElementById('refineBtn').disabled = false;
   }
 }
 
-async function callGemini(key, prompt) {
+async function refineBulk(key) {
+  const prompt = document.getElementById('promptInput').value.trim();
+  hideError();
+  document.getElementById('refineBtn').disabled = true;
+  document.getElementById('statusBar').style.display = 'flex';
+  bulkResults = new Array(bulkFiles.length).fill(null);
+  document.getElementById('bulkResults').style.display = 'none';
+  document.getElementById('bulkActions').style.display = 'none';
+
+  for (let i = 0; i < bulkFiles.length; i++) {
+    const statusEl = document.getElementById('thumb-status-' + i);
+    if (statusEl) { statusEl.textContent = 'processing'; statusEl.className = 'thumb-status processing'; }
+    document.getElementById('statusText').textContent = 'Refining ' + (i + 1) + ' of ' + bulkFiles.length + '...';
+    try {
+      const { b64, mime } = await fileToB64(bulkFiles[i]);
+      const resultUrl = currentModel === 'gemini'
+        ? await callGemini(key, b64, mime, prompt)
+        : await callOpenAI(key, b64, mime, prompt);
+      bulkResults[i] = { original: 'data:' + mime + ';base64,' + b64, refined: resultUrl, name: bulkFiles[i].name };
+      if (statusEl) { statusEl.textContent = 'done'; statusEl.className = 'thumb-status done'; }
+    } catch (err) {
+      bulkResults[i] = { error: err.message, name: bulkFiles[i].name };
+      if (statusEl) { statusEl.textContent = 'error'; statusEl.className = 'thumb-status error'; }
+    }
+    if (i < bulkFiles.length - 1) await new Promise(r => setTimeout(r, 1200));
+  }
+
+  document.getElementById('statusBar').style.display = 'none';
+  document.getElementById('refineBtn').disabled = false;
+  renderBulkResults();
+}
+
+function renderBulkResults() {
+  const grid = document.getElementById('bulkResultsGrid');
+  grid.innerHTML = '';
+  bulkResults.forEach((r, i) => {
+    if (!r || r.error) return;
+    const div = document.createElement('div');
+    div.className = 'bulk-result-card';
+    div.innerHTML = '<div class="bulk-result-pair"><div><div class="bulk-result-label">Original</div><img class="bulk-result-img" src="' + r.original + '"/></div><div><div class="bulk-result-label refined">Refined ✦</div><img class="bulk-result-img" src="' + r.refined + '"/></div></div><button class="bulk-dl-btn" onclick="downloadBulkItem(' + i + ')">Save ↓</button>';
+    grid.appendChild(div);
+  });
+  const hasResults = bulkResults.some(r => r && !r.error);
+  document.getElementById('bulkResults').style.display = hasResults ? 'flex' : 'none';
+  document.getElementById('bulkActions').style.display = hasResults ? 'flex' : 'none';
+}
+
+function fileToB64(file) {
+  return new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload = ev => res({ b64: ev.target.result.split(',')[1], mime: file.type || 'image/jpeg' });
+    reader.onerror = () => rej(new Error('File read failed'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function callGemini(key, b64, mime, prompt) {
   const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=' + key;
   const body = {
     contents: [{ parts: [
-      { text: 'You are a luxury jewellery product photographer AI for the brand Qween. Recompose this product photo to exactly match this standard: ' + prompt + ' IMPORTANT: Background must be solid #FCF9F8. No text, logo, watermark, border or frame. Return ONLY the refined image.' },
-      { inline_data: { mime_type: selectedMime, data: selectedB64 } }
+      { text: 'You are a luxury jewellery product photographer AI for the brand Qween. Recompose this product photo: ' + prompt + ' Background must be solid #FCF9F8. No text, logo, watermark or border. Return ONLY the refined image.' },
+      { inline_data: { mime_type: mime, data: b64 } }
     ]}],
     generationConfig: { responseModalities: ['IMAGE', 'TEXT'] }
   };
   const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error((err.error && err.error.message) || 'Gemini error ' + res.status);
-  }
+  if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error((err.error && err.error.message) || 'Gemini error ' + res.status); }
   const data = await res.json();
   const parts = data.candidates?.[0]?.content?.parts || [];
   const imgPart = parts.find(p => p.inlineData);
-  if (!imgPart) throw new Error('No image returned from Gemini. Try a different photo.');
+  if (!imgPart) throw new Error('No image returned from Gemini.');
   return 'data:' + imgPart.inlineData.mimeType + ';base64,' + imgPart.inlineData.data;
 }
 
-async function callOpenAI(key, prompt) {
-  const blob = b64ToBlob(selectedB64, selectedMime);
+async function callOpenAI(key, b64, mime, prompt) {
+  const blob = b64ToBlob(b64, mime);
   const form = new FormData();
   form.append('image', blob, 'product.jpg');
   form.append('prompt', 'Luxury jewellery product photo for brand Qween. ' + prompt + ' Background must be solid #FCF9F8. No text or watermarks.');
   form.append('model', 'gpt-image-1');
-  form.append('quality', 'medium');
   form.append('size', '1024x1024');
-  form.append('response_format', 'b64_json');
+  // response_format removed — gpt-image-1 returns b64_json by default
+
   const res = await fetch('https://api.openai.com/v1/images/edits', {
     method: 'POST',
     headers: { 'Authorization': 'Bearer ' + key },
     body: form
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error((err.error && err.error.message) || 'OpenAI error ' + res.status);
-  }
+  if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error((err.error && err.error.message) || 'OpenAI error ' + res.status); }
   const data = await res.json();
-  const b64 = data.data?.[0]?.b64_json;
-  if (!b64) throw new Error('No image returned from OpenAI.');
-  return 'data:image/png;base64,' + b64;
+  const b64r = data.data?.[0]?.b64_json;
+  if (!b64r) throw new Error('No image returned from OpenAI.');
+  return 'data:image/png;base64,' + b64r;
 }
 
 function b64ToBlob(b64, mime) {
-  const bin = atob(b64);
-  const arr = new Uint8Array(bin.length);
+  const bin = atob(b64); const arr = new Uint8Array(bin.length);
   for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
   return new Blob([arr], { type: mime });
 }
 
 function downloadRefined() {
   if (!refinedDataUrl) return;
-  const a = document.createElement('a');
-  a.href = refinedDataUrl;
-  a.download = 'qween-' + Date.now() + '.png';
-  a.click();
+  const a = document.createElement('a'); a.href = refinedDataUrl; a.download = 'qween-' + Date.now() + '.png'; a.click();
+}
+
+function downloadBulkItem(i) {
+  const r = bulkResults[i];
+  if (!r || !r.refined) return;
+  const a = document.createElement('a'); a.href = r.refined; a.download = 'qween-refined-' + (i + 1) + '.png'; a.click();
+}
+
+function downloadAllBulk() {
+  bulkResults.forEach((r, i) => { if (r && r.refined) { setTimeout(() => downloadBulkItem(i), i * 300); } });
 }
 
 async function shareRefined() {
   if (!refinedDataUrl) return;
   if (navigator.share) {
     try {
-      const res = await fetch(refinedDataUrl);
-      const blob = await res.blob();
+      const res = await fetch(refinedDataUrl); const blob = await res.blob();
       const file = new File([blob], 'qween-product.png', { type: 'image/png' });
-      await navigator.share({ files: [file], title: 'Product photo', text: 'Refined with Qween' });
-      return;
+      await navigator.share({ files: [file], title: 'Product photo', text: 'Refined with Qween' }); return;
     } catch {}
   }
   downloadRefined();
 }
 
-function resetAll() {
+function resetSingle() {
   selectedB64 = null; selectedMime = null; refinedDataUrl = null;
   const zone = document.getElementById('uploadZone');
   zone.innerHTML = '<div class="upload-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div><span class="upload-text">Tap to take photo</span><span class="upload-hint">or tap gallery below</span><div class="change-overlay">change</div>';
-  zone.classList.remove('has-image');
-  zone.onclick = triggerCamera;
-  document.getElementById('refineBtn').disabled = true;
+  zone.classList.remove('has-image'); zone.onclick = triggerCamera;
   document.getElementById('resultsSection').style.display = 'none';
   document.getElementById('shareSection').style.display = 'none';
+  document.getElementById('statusBar').style.display = 'none';
+  hideError(); updateRefineBtn();
+}
+
+function resetBulk() {
+  clearBulk();
+  document.getElementById('bulkResultsGrid').innerHTML = '';
   document.getElementById('statusBar').style.display = 'none';
   hideError();
 }
